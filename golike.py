@@ -20,7 +20,7 @@ try:
 except:
     pass
 Authorization = open('Authorization.txt', 'r')
-t = open('token.txt', 'r')
+token = input("Nhập token của bạn: ")
 author = Authorization.read()
 token = t.read()
 if author == '':
