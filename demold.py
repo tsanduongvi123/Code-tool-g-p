@@ -15,7 +15,7 @@ except ImportError:
     os.system("pip install art")
     os.system("pip install colorama")
 
-# Hàm đếm ngược với giao diện đẹp hơn
+# Hàm đếm ngược
 def countdown(time_sec):
     for remaining_time in range(time_sec, -1, -1):
         colors = [
@@ -28,9 +28,9 @@ def countdown(time_sec):
             time.sleep(0.12)
     print(f"\r{Fore.GREEN}Đang xử lý công việc...{Style.RESET_ALL}", end="\r")
     time.sleep(1)
-    print("\r" + " " * 50 + "\r", end="")  # Xóa dòng cũ
+    print("\r" + " " * 50 + "\r", end="")
 
-# Hàm hiển thị banner chuyên nghiệp
+# Hàm hiển thị banner
 def banner():
     os.system('cls' if os.name == 'nt' else 'clear')
     print(f"{Fore.CYAN}{Style.BRIGHT}╔════════════════════════════════════╗{Style.RESET_ALL}")
@@ -39,7 +39,7 @@ def banner():
     print(f"{Fore.CYAN}╚════════════════════════════════════╝{Style.RESET_ALL}")
     print()
 
-# Hàm hiển thị danh sách tài khoản LinkedIn
+# Hàm xử lý tài khoản LinkedIn
 def LINKEDIN():
     checkaccount = requests.get('https://gateway.golike.net/api/linkedin-account', headers=headers).json()
     user_linkedin1 = []
@@ -64,7 +64,7 @@ def LINKEDIN():
         user_tiktok = user_linkedin1[choose - 1]
         account_id = account_id1[choose - 1]
         
-        # Kiểm tra và nhập cookie
+        # Nhập cookie nếu chưa có
         checkfile = os.path.isfile(f'COOKIELINKEDIN{account_id}.txt')
         if not checkfile:
             banner()
@@ -81,7 +81,7 @@ def LINKEDIN():
         choose = int(input(f"{Fore.GREEN}📌 Số lượng job cần thực hiện: {Style.RESET_ALL}"))
         DELAY = int(input(f"{Fore.GREEN}⏱ Thời gian delay (giây): {Style.RESET_ALL}"))
         
-        # Thực hiện công việc
+        # Thực hiện job
         print(f"{Fore.CYAN}═══════════════════════════════════════{Style.RESET_ALL}")
         print(f"{Fore.YELLOW}🚀 BẮT ĐẦU THỰC HIỆN CÔNG VIỆC{Style.RESET_ALL}")
         dem = 0
@@ -120,7 +120,7 @@ def LINKEDIN():
         print(f"{Fore.CYAN}═══════════════════════════════════════{Style.RESET_ALL}")
         print(f"{Fore.YELLOW}🏁 HOÀN THÀNH: {dem} job thành công | Tổng tiền: {tong} VNĐ{Style.RESET_ALL}")
 
-# Hàm hiển thị menu chính
+# Menu chính
 def LIST():
     print(f"{Fore.YELLOW}📋 MENU CHÍNH{Style.RESET_ALL}")
     print(f"{Fore.CYAN}═══════════════════════════════════════{Style.RESET_ALL}")
@@ -128,7 +128,7 @@ def LIST():
     print(f"{Fore.GREEN}[2] Xóa Authorization hiện tại{Style.RESET_ALL}")
     print(f"{Fore.CYAN}═══════════════════════════════════════{Style.RESET_ALL}")
 
-# Cấu hình headers (giữ nguyên)
+# Cấu hình headers
 ses = requests.Session()
 User_Agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
 with open('user.txt', 'r') as f:
@@ -141,10 +141,20 @@ headers = {
     'Content-Type': 'application/json;charset=utf-8'
 }
 
-# Kiểm tra đăng nhập
+# Kiểm tra đăng nhập (ĐÃ FIX JSON ERROR)
 url1 = 'https://gateway.golike.net/api/users/me'
-checkurl1 = ses.get(url1, headers=headers).json()
-if checkurl1['status'] == 200:
+response = ses.get(url1, headers=headers)
+
+try:
+    checkurl1 = response.json()
+except Exception as e:
+    print(f"{Fore.RED}❌ Lỗi khi giải mã JSON: {e}{Style.RESET_ALL}")
+    print(f"{Fore.YELLOW}⚠️ Có thể Authorization token trong 'user.txt' đã sai hoặc hết hạn.{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}➡ Hãy đăng nhập lại để lấy token mới hoặc kiểm tra mạng.{Style.RESET_ALL}")
+    os.remove('user.txt')
+    sys.exit(1)
+
+if checkurl1.get('status') == 200:
     banner()
     print(f"{Fore.GREEN}✅ ĐĂNG NHẬP THÀNH CÔNG{Style.RESET_ALL}")
     time.sleep(2)
@@ -165,5 +175,5 @@ if checkurl1['status'] == 200:
         os.remove('user.txt')
         print(f"{Fore.GREEN}✔ Đã xóa Authorization{Style.RESET_ALL}")
 else:
-    print(f"{Fore.RED}❌ ĐĂNG NHẬP THẤT BẠI{Style.RESET_ALL}")
+    print(f"{Fore.RED}❌ ĐĂNG NHẬP THẤT BẠI: Token không hợp lệ hoặc bị chặn.{Style.RESET_ALL}")
     os.remove('user.txt')
